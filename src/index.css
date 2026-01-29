@@ -78,6 +78,19 @@
 .ProseMirror {
   outline: none;
   min-height: 80px;
+  color: inherit;
+}
+
+.prose-invert .ProseMirror {
+  color: white;
+}
+
+.prose-invert .ProseMirror strong {
+  color: white;
+}
+
+.prose-invert .ProseMirror em {
+  color: white;
 }
 
 .ProseMirror p {
@@ -168,7 +181,7 @@
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.4);
   pointer-events: none;
   height: 0;
 }
@@ -186,4 +199,11 @@
 /* Smooth transitions */
 .note-transition {
   transition: transform 0.1s ease-out, box-shadow 0.15s ease;
+}
+
+/* Dotted Background Pattern */
+.dotted-bg {
+  background-color: #d4caba;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
 }

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { Note as NoteType, CanvasState } from '@/types/note';
 import { Note } from './Note';
-import { Plus, ZoomIn, ZoomOut, Move, MousePointer2 } from 'lucide-react';
+import { Plus, ZoomIn, ZoomOut, Share2, ChevronRight, Layers as LayersIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface CanvasProps {
@@ -18,7 +18,7 @@ const MAX_SCALE = 3;
 const ZOOM_STEP = 0.1;
 
 const NOTE_COLORS = [
-  'yellow', 'blue', 'green', 'pink', 'purple', 'orange'
+  'navy', 'teal', 'navy', 'teal', 'navy', 'teal'
 ];
 
 export function Canvas({ 
@@ -119,20 +119,6 @@ export function Canvas({
     }));
   };
 
-  const resetZoom = () => {
-    setCanvasState(prev => ({
-      ...prev,
-      scale: 1,
-    }));
-  };
-
-  const centerCanvas = () => {
-    setCanvasState({
-      scale: 1,
-      offsetX: 0,
-      offsetY: 0,
-    });
-  };
 
   // Add note at center of viewport
   const handleAddNote = () => {
@@ -163,120 +149,112 @@ export function Canvas({
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-slate-50">
-      {/* Grid Background */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `
-            radial-gradient(circle, #cbd5e1 1px, transparent 1px)
-          `,
-          backgroundSize: `${20 * canvasState.scale}px ${20 * canvasState.scale}px`,
-          backgroundPosition: `${canvasState.offsetX}px ${canvasState.offsetY}px`,
-        }}
-      />
-
-      {/* Canvas Container */}
-      <div
-        ref={canvasRef}
-        className={`absolute inset-0 ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
-        onMouseDown={handleCanvasMouseDown}
-        onWheel={handleWheel}
-        onDoubleClick={handleDoubleClick}
-      >
-        {/* Transform Container */}
-        <div
-          className="absolute origin-top-left"
-          style={{
-            transform: `translate(${canvasState.offsetX}px, ${canvasState.offsetY}px) scale(${canvasState.scale})`,
-          }}
-        >
-          {/* Notes */}
-          {notes.map(note => (
-            <Note
-              key={note.id}
-              note={note}
-              isSelected={note.id === selectedNoteId}
-              onUpdate={onUpdateNote}
-              onDelete={onDeleteNote}
-              onSelect={onSelectNote}
-              canvasScale={canvasState.scale}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* UI Controls */}
-      <div className="absolute top-4 left-4 flex items-center gap-2">
-        <div className="bg-white rounded-lg shadow-md border border-slate-200 p-2 flex items-center gap-2">
-          <MousePointer2 className="w-5 h-5 text-slate-600" />
-          <span className="text-sm font-medium text-slate-700">Infinite Notepad</span>
-        </div>
-      </div>
-
-      {/* Add Note Button */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2">
+    <div className="relative w-full h-screen overflow-hidden flex flex-col">
+      {/* Top Toolbar */}
+      <div className="h-14 bg-gray-900 border-b border-gray-700 flex items-center px-4 gap-3 z-20">
         <Button
           onClick={handleAddNote}
-          className="shadow-lg hover:shadow-xl transition-shadow bg-blue-600 hover:bg-blue-700"
-          size="lg"
+          className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 h-8 text-sm"
+          size="sm"
         >
-          <Plus className="w-5 h-5 mr-2" />
-          Create Note
+          <Plus className="w-4 h-4 mr-1.5" />
+          Add Text Frame
         </Button>
-      </div>
 
-      {/* Zoom Controls */}
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-        <div className="bg-white rounded-lg shadow-md border border-slate-200 p-1 flex flex-col gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={zoomIn}
-            className="h-9 w-9"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={resetZoom}
-            className="h-9 text-xs font-mono"
-          >
-            {Math.round(canvasState.scale * 100)}%
-          </Button>
+        <div className="flex items-center gap-2 ml-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={zoomOut}
-            className="h-9 w-9"
+            className="h-8 w-8 text-white hover:bg-gray-800"
           >
             <ZoomOut className="w-4 h-4" />
           </Button>
-        </div>
-      </div>
-
-      {/* Bottom Left Controls */}
-      <div className="absolute bottom-4 left-4 flex flex-col gap-2">
-        <div className="bg-white rounded-lg shadow-md border border-slate-200 p-2">
+          <span className="text-white text-sm font-mono min-w-[3rem] text-center">
+            {Math.round(canvasState.scale * 100)}%
+          </span>
           <Button
             variant="ghost"
-            size="sm"
-            onClick={centerCanvas}
-            className="text-xs"
+            size="icon"
+            onClick={zoomIn}
+            className="h-8 w-8 text-white hover:bg-gray-800"
           >
-            <Move className="w-4 h-4 mr-2" />
-            Center View
+            <ZoomIn className="w-4 h-4" />
           </Button>
         </div>
-        <div className="text-xs text-slate-500 bg-white/80 rounded px-2 py-1">
-          {notes.length} note{notes.length !== 1 ? 's' : ''}
-        </div>
+
+        <div className="flex-1" />
+
+        <Button
+          className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 h-8 text-sm"
+          size="sm"
+        >
+          <Share2 className="w-4 h-4 mr-1.5" />
+          Share
+        </Button>
       </div>
 
-      {/* Instructions */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-slate-400 bg-white/80 rounded-lg px-4 py-2">
-        Double-click to add note • Drag to pan • Ctrl+Scroll to zoom • Drag notes to move
+      {/* Main Content Area */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar - Layers Panel */}
+        <div className="w-40 bg-gray-100 border-r border-gray-300 overflow-y-auto">
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-3">
+              <LayersIcon className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Layers</span>
+            </div>
+            <div className="space-y-1">
+              {notes.map((note, index) => (
+                <div
+                  key={note.id}
+                  onClick={() => onSelectNote(note.id)}
+                  className={`flex items-center gap-1.5 px-2 py-1.5 rounded cursor-pointer text-xs hover:bg-gray-200 ${
+                    note.id === selectedNoteId ? 'bg-gray-200' : ''
+                  }`}
+                >
+                  <ChevronRight className="w-3 h-3 text-gray-500" />
+                  <span className="text-gray-700">Layer {notes.length - index}</span>
+                </div>
+              ))}
+              {notes.length === 0 && (
+                <div className="text-xs text-gray-400 px-2 py-3">No layers yet</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Canvas Area */}
+        <div className="flex-1 relative dotted-bg">
+          {/* Canvas Container */}
+          <div
+            ref={canvasRef}
+            className={`absolute inset-0 ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
+            onMouseDown={handleCanvasMouseDown}
+            onWheel={handleWheel}
+            onDoubleClick={handleDoubleClick}
+          >
+            {/* Transform Container */}
+            <div
+              className="absolute origin-top-left"
+              style={{
+                transform: `translate(${canvasState.offsetX}px, ${canvasState.offsetY}px) scale(${canvasState.scale})`,
+              }}
+            >
+              {/* Notes */}
+              {notes.map(note => (
+                <Note
+                  key={note.id}
+                  note={note}
+                  isSelected={note.id === selectedNoteId}
+                  onUpdate={onUpdateNote}
+                  onDelete={onDeleteNote}
+                  onSelect={onSelectNote}
+                  canvasScale={canvasState.scale}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

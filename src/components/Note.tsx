@@ -3,7 +3,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import type { Note as NoteType } from '@/types/note';
-import { X, GripVertical, Bold, Italic, List, Heading2 } from 'lucide-react';
+import { X, GripVertical, Bold, Italic, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface NoteProps {
@@ -15,13 +15,9 @@ interface NoteProps {
   canvasScale: number;
 }
 
-const NOTE_COLORS: Record<string, { bg: string; border: string; hover: string }> = {
-  yellow: { bg: 'bg-yellow-100', border: 'border-yellow-300', hover: 'hover:border-yellow-400' },
-  blue: { bg: 'bg-blue-100', border: 'border-blue-300', hover: 'hover:border-blue-400' },
-  green: { bg: 'bg-green-100', border: 'border-green-300', hover: 'hover:border-green-400' },
-  pink: { bg: 'bg-pink-100', border: 'border-pink-300', hover: 'hover:border-pink-400' },
-  purple: { bg: 'bg-purple-100', border: 'border-purple-300', hover: 'hover:border-purple-400' },
-  orange: { bg: 'bg-orange-100', border: 'border-orange-300', hover: 'hover:border-orange-400' },
+const NOTE_COLORS: Record<string, { bg: string; header: string; text: string }> = {
+  navy: { bg: 'bg-slate-800', header: 'bg-slate-900', text: 'text-white' },
+  teal: { bg: 'bg-teal-700', header: 'bg-teal-800', text: 'text-white' },
 };
 
 export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasScale }: NoteProps) {
@@ -91,11 +87,7 @@ export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasSca
     };
   }, [isDragging, note.id, onUpdate, canvasScale]);
 
-  const colorTheme = NOTE_COLORS[note.color] || NOTE_COLORS[0];
-
-  const toggleHeading = () => {
-    editor?.chain().focus().toggleHeading({ level: 2 }).run();
-  };
+  const colorTheme = NOTE_COLORS[note.color] || NOTE_COLORS['navy'];
 
   const toggleBold = () => {
     editor?.chain().focus().toggleBold().run();
@@ -112,8 +104,8 @@ export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasSca
   return (
     <div
       ref={noteRef}
-      className={`absolute rounded-lg shadow-lg transition-shadow ${colorTheme.bg} ${colorTheme.border} border-2 ${colorTheme.hover}
-        ${isSelected ? 'ring-2 ring-blue-500 shadow-xl' : ''} ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+      className={`absolute rounded-lg shadow-xl overflow-hidden ${colorTheme.bg}
+        ${isSelected ? 'ring-2 ring-blue-400' : ''} ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
       style={{
         left: note.x,
         top: note.y,
@@ -124,24 +116,17 @@ export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasSca
       onClick={() => onSelect(note.id)}
     >
       {/* Header with drag handle and controls */}
-      <div className="flex items-center justify-between p-2 border-b border-black/10 note-header">
-        <div className="flex items-center gap-1">
-          <GripVertical className="w-4 h-4 text-black/40" />
-          
+      <div className={`flex items-center justify-between px-3 py-2 ${colorTheme.header} note-header`}>
+        <div className="flex items-center gap-2 flex-1">
+          <GripVertical className="w-4 h-4 text-white/40" />
+          <span className="text-xs text-white/70">Inter</span>
+
           {/* Formatting Toolbar */}
-          <div className="note-toolbar flex items-center gap-0.5">
+          <div className="note-toolbar flex items-center gap-1 ml-2">
             <Button
               variant="ghost"
               size="icon"
-              className={`h-6 w-6 ${editor?.isActive('heading') ? 'bg-black/10' : ''}`}
-              onClick={(e) => { e.stopPropagation(); toggleHeading(); }}
-            >
-              <Heading2 className="w-3 h-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`h-6 w-6 ${editor?.isActive('bold') ? 'bg-black/10' : ''}`}
+              className={`h-6 w-6 text-white/70 hover:text-white hover:bg-white/10 ${editor?.isActive('bold') ? 'bg-white/20' : ''}`}
               onClick={(e) => { e.stopPropagation(); toggleBold(); }}
             >
               <Bold className="w-3 h-3" />
@@ -149,7 +134,7 @@ export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasSca
             <Button
               variant="ghost"
               size="icon"
-              className={`h-6 w-6 ${editor?.isActive('italic') ? 'bg-black/10' : ''}`}
+              className={`h-6 w-6 text-white/70 hover:text-white hover:bg-white/10 ${editor?.isActive('italic') ? 'bg-white/20' : ''}`}
               onClick={(e) => { e.stopPropagation(); toggleItalic(); }}
             >
               <Italic className="w-3 h-3" />
@@ -157,18 +142,18 @@ export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasSca
             <Button
               variant="ghost"
               size="icon"
-              className={`h-6 w-6 ${editor?.isActive('bulletList') ? 'bg-black/10' : ''}`}
+              className={`h-6 w-6 text-white/70 hover:text-white hover:bg-white/10 ${editor?.isActive('bulletList') ? 'bg-white/20' : ''}`}
               onClick={(e) => { e.stopPropagation(); toggleBulletList(); }}
             >
               <List className="w-3 h-3" />
             </Button>
           </div>
         </div>
-        
+
         <Button
           variant="ghost"
           size="icon"
-          className="note-delete h-6 w-6 text-black/40 hover:text-red-500 hover:bg-red-50"
+          className="note-delete h-6 w-6 text-white/50 hover:text-white hover:bg-white/10"
           onClick={(e) => { e.stopPropagation(); onDelete(note.id); }}
         >
           <X className="w-4 h-4" />
@@ -176,10 +161,10 @@ export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasSca
       </div>
 
       {/* Editor Content */}
-      <div className="p-3">
-        <EditorContent 
-          editor={editor} 
-          className="prose prose-sm max-w-none"
+      <div className={`p-4 ${colorTheme.text}`}>
+        <EditorContent
+          editor={editor}
+          className="prose prose-sm prose-invert max-w-none"
           onClick={(e) => e.stopPropagation()}
         />
       </div>
@@ -212,7 +197,7 @@ export function Note({ note, isSelected, onUpdate, onDelete, onSelect, canvasSca
           window.addEventListener('mouseup', stopResize);
         }}
       >
-        <svg className="w-3 h-3 text-black/30" viewBox="0 0 10 10">
+        <svg className="w-3 h-3 text-white/30" viewBox="0 0 10 10">
           <path d="M0 10L10 0M5 10L10 5" stroke="currentColor" strokeWidth="1.5" fill="none" />
         </svg>
       </div>
